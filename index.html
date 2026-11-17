@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>重耳流亡記：霸業之路（蛇梯棋）</title>
+  <style>
+    :root {
+      --bg-paper: #f4ecda;
+      --bg-card: #fbf7ed;
+      --bg-panel: #efe4cc;
+      --ink-dark: #261c14;
+      --ink-muted: #5f4e3d;
+      --cinnabar: #a62b21;
+      --cinnabar-light: #fbeae8;
+      --gold: #b88414;
+      --gold-light: #fef6dc;
+      --jade: #1e6b52;
+      --jade-light: #e6f4ee;
+      --indigo: #284b7a;
+      --indigo-light: #e9f0fa;
+      --plum: #6d2e68;
+      --plum-light: #f6eaf5;
+      --river: #d8a657;
+      --border-classic: #c9b58e;
+      --shadow-soft: 0 6px 20px rgba(48, 32, 16, 0.12);
+      --shadow-card: 0 2px 8px rgba(48, 32, 16, 0.08);
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --font-serif: "Noto Serif TC", "Songti TC", "PMingLiU", "DFKai-SB", Georgia, serif;
+      --font-sans: "PingFang TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-sans);
+      color: var(--ink-dark);
+      background:
+        radial-gradient(circle at 15% 15%, rgba(216, 166, 87, 0.14), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(166, 43, 33, 0.08), transparent 40%),
+        var(--bg-paper);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #35251a 0%, #4d3524 60%, #3a271b 100%);
+      color: #f8efd9;
+      padding: 12px 20px;
+      border-bottom: 3px solid var(--gold);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .seal-badge {
+      width: 42px;
+      height: 42px;
+      background: var(--cinnabar);
+      border: 2px solid #f4d38d;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      font-family: var(--font-serif);
+      font-weight: 900;
+      font-size: 18px;
+      color: #fff6e5;
+      box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.25);
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-family: var(--font-serif);
+      font-size: clamp(18px, 2.2vw, 24px);
+      letter-spacing: 1px;
+      color: #fcefd3;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: #d7c3a0;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.14s ease, box-shadow 0.14s ease, background 0.14s ease, opacity 0.14s ease;
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-header {
+      background: rgba(255, 246, 224, 0.12);
+      color: #f8efd9;
+      border: 1px solid rgba(244, 211, 141, 0.4);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-header:hover {
+      background: rgba(255, 246, 224, 0.22);
+    }
+
+    /* Layout */
+    .main-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.85fr) minmax(320px, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    @media (max-width: 1080px) {
+      .main-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Board Wrapper */
+    .board-section {
+      background: var(--bg-card);
+      border: 2px solid var(--border-classic);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+    }
+
+    .board-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px dashed var(--border-classic);
+    }
+
+    .stage-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      align-items: center;
+    }
+
+    .legend-pill {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .legend-s1 { background: #eef2e6; color: #3f5529; }
+    .legend-s2 { background: #fdf0df; color: #8c4b11; }
+    .legend-s3 { background: #fae8e6; color: #8d241b; }
+
+    .board-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+    }
+
+    .toggle-btn {
+      background: var(--bg-panel);
+      color: var(--ink-dark);
+      border: 1px solid var(--border-classic);
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .toggle-btn.active {
+      background: var(--ink-dark);
+      color: #f8efd9;
+    }
+
+    /* Board Grid & SVG */
+    .board-stage {
+      position: relative;
+      width: 100%;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #efe5cf;
+      border: 2px solid #b59b72;
+      padding: 8px;
+    }
+
+    .yellow-river-bg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+    }
+
+    .board-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-rows: repeat(5, minmax(96px, auto));
+      gap: 7px;
+    }
+
+    @media (max-width: 700px) {
+      .board-grid {
+        grid-template-rows: repeat(5, minmax(78px, auto));
+        gap: 4px;
+      }
+    }
+
+    .overlay-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 3;
+      transition: opacity 0.25s ease;
+    }
+
+    .overlay-svg.hidden-lines {
+      opacity: 0.08;
+    }
+
+    /* Tile Styling */
+    .tile {
+      position: relative;
+      background: rgba(255, 252, 245, 0.92);
+      border: 1.5px solid #cbb791;
+      border-radius: 9px;
+      padding: 5px 6px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 98px;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
+      box-shadow: 0 2px 5px rgba(55, 38, 18, 0.06);
+      overflow: visible;
+    }
+
+    .tile:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(55, 38, 18, 0.16);
+      border-color: var(--gold);
+      z-index: 5;
+    }
+
+    .tile.active-step {
+      box-shadow: 0 0 0 3px var(--gold), 0 6px 16px rgba(184, 132, 20, 0.35);
+      transform: scale(1.03);
+      z-index: 6;
+    }
+
+    /* Stage tints */
+    .tile.stage-1 { background: linear-gradient(180deg, #f8faf3 0%, #eff4e6 100%); }
+    .tile.stage-2 { background: linear-gradient(180deg, #fffaf1 0%, #fbefd9 100%); }
+    .tile.stage-3 { background: linear-gradient(180deg, #fff6f4 0%, #fae7e3 100%); }
+
+    /* Special tile accents */
+    .tile.type-start {
+      border: 2px solid var(--jade);
+      background: linear-gradient(135deg, #e5f5ed 0%, #f7fcf9 100%);
+    }
+    .tile.type-goal {
+      border: 2px solid var(--gold);
+      background: linear-gradient(135deg, #fff3c9 0%, #fde39b 100%);
+      box-shadow: 0 0 12px rgba(184, 132, 20, 0.25);
+    }
+    .tile.type-ladder {
+      border-color: #2f855a;
+      background: linear-gradient(180deg, #edf9f2 0%, #dcf2e5 100%);
+    }
+    .tile.type-snake {
+      border-color: #c53030;
+      background: linear-gradient(180deg, #fff0f0 0%, #fde0e0 100%);
+    }
+    .tile.type-chance {
+      border-color: var(--indigo);
+      background: linear-gradient(180deg, #f1f6fd 0%, #e1ecfb 100%);
+    }
+    .tile.type-fate {
+      border-color: var(--plum);
+      background: linear-gradient(180deg, #faf2fa 0%, #f1e0f0 100%);
+    }
+    .tile.type-reward {
+      border-color: #b7791f;
+      background: linear-gradient(180deg, #fffbeb 0%, #fef0c3 100%);
+    }
+    .tile.type-punish {
+      border-color: #9b2c2c;
+      background: linear-gradient(180deg, #fdf2f2 0%, #f9dede 100%);
+    }
+
+    .tile-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .tile-num {
+      font-family: var(--font-serif);
+      font-weight: 800;
+      font-size: 13px;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: rgba(38, 28, 20, 0.1);
+      color: var(--ink-dark);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .type-goal .tile-num {
+      background: var(--cinnabar);
+      color: #fff;
+    }
+
+    .tile-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 78px;
+    }
+
+    .tag-ladder { background: #1e6b52; color: #fff; }
+    .tag-snake { background: #b91c1c; color: #fff; }
+    .tag-chance { background: #284b7a; color: #fff; }
+    .tag-fate { background: #6d2e68; color: #fff; }
+    .tag-reward { background: #b45309; color: #fff; }
+    .tag-punish { background: #7f1d1d; color: #fff; }
+    .tag-place { background: rgba(75, 55, 35, 0.12); color: #4a3723; }
+
+    .tile-title {
+      font-family: var(--font-serif);
+      font-weight: 700;
+      font-size: 12px;
+      line-height: 1.25;
+      margin: 3px 0 2px;
+      color: var(--ink-dark);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .tile-effect {
+      font-size: 10.5px;
+      line-height: 1.25;
+      color: var(--ink-muted);
+      font-weight: 600;
+    }
+
+    .tile-arrow {
+      position: absolute;
+      font-size: 11px;
+      color: rgba(74, 55, 35, 0.45);
+      pointer-events: none;
+      font-weight: bold;
+    }
+
+    .arrow-right { right: -7px; top: 50%; transform: translateY(-50%); }
+    .arrow-left { left: -7px; top: 50%; transform: translateY(-50%); }
+    .arrow-up { top: -8px; left: 50%; transform: translateX(-50%); }
+
+    /* Player Tokens on Tile */
+    .tile-tokens {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      margin-top: 3px;
+      min-height: 20px;
+      align-items: center;
+      z-index: 4;
+    }
+
+    .token {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      position: relative;
+      animation: tokenPop 0.25s ease;
+    }
+
+    .token.current-turn-token {
+      box-shadow: 0 0 0 2px var(--gold), 0 3px 8px rgba(0, 0, 0, 0.4);
+      transform: scale(1.12);
+    }
+
+    .token-shield {
+      position: absolute;
+      top: -6px;
+      right: -6px;
+      font-size: 10px;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.4));
+    }
+
+    @keyframes tokenPop {
+      0% { transform: scale(0.7); }
+      70% { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 700px) {
+      .tile-title { font-size: 10.5px; }
+      .tile-effect { font-size: 9.5px; }
+      .tile-tag { display: none; }
+      .tile-num { width: 18px; height: 18px; font-size: 11px; }
+      .token { width: 18px; height: 18px; font-size: 10px; }
+    }
+
+    /* Right Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1.5px solid var(--border-classic);
+      border-radius: var(--radius-lg);
+      padding: 14px;
+      box-shadow: var(--shadow-card);
+    }
+
+    .panel-title {
+      font-family: var(--font-serif);
+      font-size: 15px;
+      font-weight: 800;
+      margin: 0 0 10px;
+      color: var(--ink-dark);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5d8bc;
+      padding-bottom: 7px;
+    }
+
+    /* Dice & Turn Panel */
+    .turn-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: linear-gradient(135deg, #f8f1e1 0%, #efe2c6 100%);
+      border: 1.5px solid #d5bf92;
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+    }
+
+    .turn-player-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .turn-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 800;
+      font-size: 16px;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      flex-shrink: 0;
+    }
+
+    .turn-meta h3 {
+      margin: 0;
+      font-size: 15px;
+      font-family: var(--font-serif);
+    }
+
+    .turn-meta p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--ink-muted);
+    }
+
+    .dice-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .dice-box {
+      width: 62px;
+      height: 62px;
+      background: #fffdf8;
+      border: 2.5px solid #8c6b3f;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      font-weight: 900;
+      color: var(--cinnabar);
+      box-shadow: inset 0 -4px 0 #e6d7b9, 0 4px 10px rgba(0, 0, 0, 0.12);
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .dice-box.rolling {
+      animation: diceShake 0.45s ease-in-out infinite;
+    }
+
+    @keyframes diceShake {
+      0% { transform: rotate(0deg) scale(1); }
+      25% { transform: rotate(-12deg) scale(1.08); }
+      50% { transform: rotate(10deg) scale(0.96); }
+      75% { transform: rotate(-8deg) scale(1.06); }
+      100% { transform: rotate(0deg) scale(1); }
+    }
+
+    .btn-roll {
+      flex: 1;
+      background: linear-gradient(135deg, var(--cinnabar) 0%, #871f17 100%);
+      color: #fff8eb;
+      font-family: var(--font-serif);
+      font-size: 17px;
+      font-weight: 800;
+      padding: 14px 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(166, 43, 33, 0.35);
+      letter-spacing: 1px;
+    }
+
+    .btn-roll:hover:not(:disabled) {
+      background: linear-gradient(135deg, #ba3126 0%, #972219 100%);
+      transform: translateY(-1px);
+    }
+
+    .status-hint {
+      margin-top: 9px;
+      font-size: 12.5px;
+      color: var(--ink-muted);
+      background: #f5edd9;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border-left: 3px solid var(--gold);
+    }
+
+    /* Player List */
+    .player-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .player-row {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 9px;
+      background: #faf5e8;
+      border: 1px solid #e5d8bc;
+      transition: all 0.2s ease;
+    }
+
+    .player-row.is-current {
+      background: #fff9e8;
+      border-color: var(--gold);
+      box-shadow: 0 2px 8px rgba(184, 132, 20, 0.16);
+    }
+
+    .p-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      color: #fff;
+      font-weight: 800;
+      font-size: 13px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    .p-info {
+      min-width: 0;
+    }
+
+    .p-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .p-sub {
+      font-size: 11.5px;
+      color: var(--ink-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .p-pos {
+      font-family: var(--font-serif);
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--cinnabar);
+      background: #f5e9d3;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .mini-chip {
+      font-size: 10px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+    .chip-ai { background: #e2e8f0; color: #334155; }
+    .chip-shield { background: #dbeafe; color: #1e40af; }
+    .chip-skip { background: #fee2e2; color: #991b1b; }
+
+    /* Tile Inspector */
+    .inspector-box {
+      font-size: 13px;
+      line-height: 1.55;
+      background: #f8f2e4;
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1px solid #dfd0b2;
+    }
+
+    .inspector-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .inspector-num {
+      background: var(--ink-dark);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+
+    .inspector-title {
+      font-family: var(--font-serif);
+      font-weight: 800;
+      font-size: 14.5px;
+    }
+
+    /* Event Log */
+    .log-list {
+      max-height: 210px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 4px;
+    }
+
+    .log-item {
+      font-size: 12px;
+      line-height: 1.45;
+      padding: 6px 8px;
+      border-radius: 7px;
+      background: #f8f3e6;
+      border-left: 3px solid #bfa67a;
+    }
+
+    .log-item.log-ladder { border-left-color: var(--jade); background: var(--jade-light); }
+    .log-item.log-snake { border-left-color: var(--cinnabar); background: var(--cinnabar-light); }
+    .log-item.log-card { border-left-color: var(--indigo); background: var(--indigo-light); }
+    .log-item.log-win { border-left-color: var(--gold); background: var(--gold-light); font-weight: 700; }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(25, 16, 10, 0.65);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 2px solid var(--gold);
+      border-radius: 16px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+      padding: 20px 22px;
+      position: relative;
+      animation: modalUp 0.22s ease;
+    }
+
+    @keyframes modalUp {
+      from { transform: translateY(14px) scale(0.97); opacity: 0; }
+      to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #ebe0c9;
+      color: var(--ink-dark);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal-title {
+      font-family: var(--font-serif);
+      font-size: 20px;
+      font-weight: 900;
+      margin: 0 0 12px;
+      padding-right: 36px;
+    }
+
+    /* Event / Card Popup */
+    .card-modal-box {
+      max-width: 460px;
+      text-align: center;
+      border-width: 3px;
+    }
+
+    .card-badge {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .card-icon-big {
+      font-size: 46px;
+      margin: 4px 0 8px;
+    }
+
+    .card-desc {
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #f5edd9;
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin: 12px 0;
+      text-align: left;
+      border: 1px solid #dfd0b2;
+    }
+
+    .card-effect-pill {
+      font-family: var(--font-serif);
+      font-weight: 800;
+      font-size: 15px;
+      padding: 8px 14px;
+      border-radius: 9px;
+      background: #fff7df;
+      border: 1.5px solid var(--gold);
+      color: var(--cinnabar);
+      margin-bottom: 14px;
+      display: inline-block;
+    }
+
+    .card-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cinnabar) 0%, #861e16 100%);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14.5px;
+    }
+
+    .btn-secondary {
+      background: linear-gradient(135deg, var(--indigo) 0%, #1d385c 100%);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14.5px;
+    }
+
+    .btn-outline {
+      background: #efe4cc;
+      color: var(--ink-dark);
+      border: 1px solid var(--border-classic);
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    /* Compendium Grid (4 Decks) */
+    .deck-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .deck-card {
+      border-radius: 10px;
+      padding: 12px;
+      border: 1.5px solid;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .deck-card h4 {
+      margin: 0 0 6px;
+      font-family: var(--font-serif);
+      font-size: 15px;
+    }
+
+    .deck-chance { background: var(--indigo-light); border-color: #93b4e0; }
+    .deck-fate { background: var(--plum-light); border-color: #cca0c9; }
+    .deck-reward { background: var(--gold-light); border-color: #e0be6b; }
+    .deck-punish { background: var(--cinnabar-light); border-color: #e2a49f; }
+
+    /* Setup Modal */
+    .setup-players {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .setup-row {
+      display: grid;
+      grid-template-columns: 32px 1fr 125px;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: #f5edd9;
+      border-radius: 9px;
+      border: 1px solid #dfd0b2;
+    }
+
+    .setup-row input, .setup-row select {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #c5b18c;
+      font-family: inherit;
+      font-size: 13.5px;
+      background: #fffdf8;
+    }
+
+    .setup-options {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background: #faf5e8;
+      padding: 10px 12px;
+      border-radius: 9px;
+      border: 1px solid #e5d8bc;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .setup-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="seal-badge">晉霸</div>
+      <div>
+        <h1>《重耳流亡記：霸業之路（蛇梯棋）》</h1>
+        <p>《左傳》公子重耳周遊列國互動桌遊 ｜ 30格蛇行棋盤・貴人梯子・反派毒蛇・機會命運獎懲</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-header" id="btnSound">🔊 音效：開</button>
+      <button class="btn-header" id="btnCompendium">🃏 四大牌組圖鑑</button>
+      <button class="btn-header" id="btnRules">📜 遊戲規則</button>
+      <button class="btn-header" id="btnNewGame">🔄 開新局 / 設定玩家</button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <!-- Left: Board -->
+    <section class="board-section">
+      <div class="board-toolbar">
+        <div class="stage-legend">
+          <span class="legend-pill legend-s1">① 蒲城與狄國 (1-7)</span>
+          <span class="legend-pill legend-s2">② 晉衛齊曹宋鄭 (8-18)</span>
+          <span class="legend-pill legend-s3">③ 楚秦與返晉稱霸 (19-30)</span>
+        </div>
+        <div class="board-controls">
+          <button class="toggle-btn active" id="btnToggleLines">🐍🪜 顯示蛇梯連線</button>
+        </div>
+      </div>
+
+      <div class="board-stage" id="boardStage">
+        <!-- Decorative Yellow River backdrop -->
+        <svg class="yellow-river-bg" viewBox="0 0 1000 700" preserveAspectRatio="none">
+          <path d="M 470 -20 C 560 120, 390 250, 490 380 C 580 500, 410 600, 480 730"
+                fill="none" stroke="#c78d36" stroke-width="58" stroke-linecap="round" opacity="0.45"/>
+          <path d="M 470 -20 C 560 120, 390 250, 490 380 C 580 500, 410 600, 480 730"
+                fill="none" stroke="#f5d58e" stroke-width="18" stroke-linecap="round" stroke-dasharray="22 18" opacity="0.6"/>
+          <text x="485" y="345" font-size="28" fill="#7c5218" font-family="serif" font-weight="bold" opacity="0.7" transform="rotate(-12 485 345)">黃 河</text>
+        </svg>
+
+        <div class="board-grid" id="boardGrid"></div>
+        <svg class="overlay-svg" id="overlaySvg"></svg>
+      </div>
+    </section>
+
+    <!-- Right: Controls & Info -->
+    <aside class="sidebar">
+      <!-- Turn & Dice -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>🎲 行動控制台</span>
+          <span id="roundLabel" style="font-size:12px;color:var(--ink-muted);">第 1 回合</span>
+        </div>
+
+        <div class="turn-banner">
+          <div class="turn-player-info">
+            <div class="turn-avatar" id="turnAvatar">耳</div>
+            <div class="turn-meta">
+              <h3 id="turnPlayerName">重耳</h3>
+              <p id="turnPlayerLoc">目前位於：第 1 格【起點】</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="dice-area">
+          <div class="dice-box" id="diceBox">🎲</div>
+          <button class="btn-roll" id="btnRoll">擲骰前進</button>
+        </div>
+
+        <div class="status-hint" id="statusHint">
+          點擊「擲骰前進」或按空白鍵開始流亡之旅！（目標：第 30 格踐土稱霸）
+        </div>
+      </div>
+
+      <!-- Players -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>🚩 諸侯與從亡者進度</span>
+        </div>
+        <div class="player-list" id="playerList"></div>
+      </div>
+
+      <!-- Tile Inspector -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>🗺️ 格位史實解說</span>
+          <span style="font-size:11px;color:var(--ink-muted);">點擊棋盤格可查看</span>
+        </div>
+        <div class="inspector-box" id="inspectorBox"></div>
+      </div>
+
+      <!-- Event Log -->
+      <div class="panel">
+        <div class="panel-title">
+          <span>📜 流亡戰史紀錄</span>
+        </div>
+        <div class="log-list" id="logList"></div>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Card / Event Popup Modal -->
+  <div class="modal-backdrop" id="eventModal">
+    <div class="modal-box card-modal-box" id="eventModalBox">
+      <div class="card-badge" id="emBadge">機會卡</div>
+      <div class="card-icon-big" id="emIcon">🎴</div>
+      <h2 class="modal-title" id="emTitle" style="padding:0;">標題</h2>
+      <div class="card-desc" id="emDesc">內容說明</div>
+      <div class="card-effect-pill" id="emEffect">效果</div>
+      <div class="card-actions" id="emActions"></div>
+    </div>
+  </div>
+
+  <!-- Compendium Modal (4 Required Decks) -->
+  <div class="modal-backdrop" id="compendiumModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('compendiumModal')">✕</button>
+      <h2 class="modal-title">🃏 四大牌組圖鑑（機會・命運・獎勵・懲罰各 2 項）</h2>
+      <p style="font-size:13px;color:var(--ink-muted);margin-top:0;">
+        完全對應《左傳》「公子重耳周遊列國」桌遊海報設計規範，於棋盤對應歷史格位觸發：
+      </p>
+      <div class="deck-grid" id="compendiumGrid"></div>
+    </div>
+  </div>
+
+  <!-- Rules Modal -->
+  <div class="modal-backdrop" id="rulesModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('rulesModal')">✕</button>
+      <h2 class="modal-title">📜 《重耳流亡記：霸業之路》遊戲規則</h2>
+      <div style="font-size:14px;line-height:1.7;">
+        <p><strong>1. 遊戲目標：</strong>從第 1 格「蒲城出逃」出發，歷經狄國、晉國動盪、衛、齊、曹、宋、鄭、楚、秦諸侯國，率先抵達 <strong>第 30 格【終點：晉文霸業】</strong>者勝出！</p>
+        <p><strong>2. 🪜 梯子（貴人相助 / 順境）：</strong>踩到梯底（第 11、21、23 格）立即順著梯子爬升至高處格數，大幅前進。</p>
+        <p><strong>3. 🐍 毒蛇（反派迫害 / 逆境）：</strong>踩到蛇頭（第 8、13、15、26 格）將順著蛇身滑落至低處格數。若持有「🛡️ 免除毒蛇護盾」（來自機會 ②），可自動抵擋一次滑落！</p>
+        <p><strong>4. 🃏 機會・命運・獎勵・懲罰：</strong></p>
+        <ul style="margin:4px 0 10px;padding-left:20px;">
+          <li><strong>機會（第 16、25 格）：</strong>曹大夫僖負羈盤飧寘璧（前進 3 格）、寬恕寺人披與頭須（免除下一次毒蛇滑落，或直接前進 3 格）。</li>
+          <li><strong>命運（第 6、22 格）：</strong>驪姬之亂（退回第 2 格蒲城）、鄭大夫叔詹之諫（前進 2 格）。</li>
+          <li><strong>獎勵（第 14、27 格）：</strong>齊姜與狐偃醉遣（再擲骰子一次）、介之推不言祿（前進 2 格）。</li>
+          <li><strong>懲罰（第 3、20 格）：</strong>頭須竊財（暫停一回合）、楚臣子玉請殺（後退 2 格並暫停一回合）。</li>
+        </ul>
+        <p><strong>5. 連鎖保護規則：</strong>因卡牌效果、前進／後退、梯子或毒蛇移動至目標格後，該回合即結束移動，不會再次觸發目標格效果（避免無限循環）。</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Setup Modal -->
+  <div class="modal-backdrop" id="setupModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('setupModal')">✕</button>
+      <h2 class="modal-title">⚙️ 開新局與玩家設定</h2>
+      <p style="font-size:13px;color:var(--ink-muted);margin:0;">支援 1～4 人遊玩，可自由切換「玩家」或「電腦 AI」：</p>
+      <div class="setup-players" id="setupPlayers"></div>
+      <div class="setup-options">
+        <label>
+          <input type="checkbox" id="optExactFinish" />
+          <span>嚴格模式：必須「精準擲入第 30 格」，超過則原地反彈（取消勾選則抵達或超過 30 格即獲勝）</span>
+        </label>
+        <label>
+          <input type="checkbox" id="optShuffleDecks" />
+          <span>隨機抽卡：踩到「命運」或「機會」時隨機從該類 2 張牌中抽取（取消勾選則依歷史時序對應發牌）</span>
+        </label>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button class="btn-outline" onclick="closeModal('setupModal')">取消</button>
+        <button class="btn-primary" id="btnStartConfigured">🚀 開始新局</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. 完整 30 格棋盤與牌組資料
+    // ==========================================
+    const TILES = [
+      { id: 1, stage: 1, type: "start", tag: "起點・蒲城", title: "驪姬之譖・出逃蒲城", desc: "晉獻公寵信驪姬，太子申生自縊，重耳自蒲城出逃，展開十九年流亡生涯！", effectText: "冒險起點", action: null },
+      { id: 2, stage: 1, type: "move", tag: "人物・寺人披", title: "寺人披斬袖追殺", desc: "蒲城之役，寺人披奉晉獻公之命追殺重耳，急切間斬斷重耳衣袖。", effectText: "後退 1 格", action: { kind: "delta", value: -1 } },
+      { id: 3, stage: 1, type: "punish", tag: "懲罰 ①", title: "小臣頭須竊財潛逃", desc: "逃離蒲城時，看守庫藏的小臣頭須竊取所有財物潛逃，盤纏盡失、寸步難行。", effectText: "原地暫停 1 回合", cardKey: "punish1" },
+      { id: 4, stage: 1, type: "normal", tag: "狄國", title: "投奔母鄉狄國", desc: "投奔母親狐姬故鄉狄國，得狐偃（子犯）、趙衰、顛頡、魏武子、司空季子五賢士輔佐。", effectText: "安頓休息（安全格）", action: null },
+      { id: 5, stage: 1, type: "move", tag: "妻子一・季隗", title: "娶季隗生伯鯈叔劉", desc: "狄人伐廧咎如獲二女，重耳娶季隗生伯鯈、叔劉，叔隗嫁趙衰生趙盾。", effectText: "前進 1 格", action: { kind: "delta", value: 1 } },
+      { id: 6, stage: 1, type: "fate", tag: "命運 ①", title: "命運考驗（一）", desc: "抽取命運卡，決定蒲城與狄國時期的突發變局。", effectText: "抽命運卡 ①", cardKey: "fate1", deck: "fate" },
+      { id: 7, stage: 1, type: "normal", tag: "晉國政變", title: "處狄十二年・婉拒返國", desc: "晉獻公卒，里克殺驪姬與奚齊，迎立重耳；重耳謹慎辭謝，避免捲入政爭漩渦。", effectText: "謹慎觀望（安全格）", action: null },
+
+      { id: 8, stage: 2, type: "snake", tag: "🐍 毒蛇頭 1", title: "晉惠公夷吾追殺", desc: "弟弟夷吾即位為晉惠公，派寺人披二度追殺至渭濱，情勢極度危急！", effectText: "滑落回 第 4 格（狄國）", snakeTo: 4 },
+      { id: 9, stage: 2, type: "normal", tag: "晉國動盪", title: "狐突大義不從被殺", desc: "晉懷公即位，下令從亡者限期返國，否則殺其家人；外公狐突不從命，從容就義。", effectText: "悲憤前行（安全格）", action: null },
+      { id: 10, stage: 2, type: "move", tag: "衛國", title: "衛文公無禮慢待", desc: "重耳一行過衛國，衛文公不以禮相待，被迫繼續向南流浪。", effectText: "後退 1 格", action: { kind: "delta", value: -1 } },
+      { id: 11, stage: 2, type: "ladder", tag: "🪜 梯子底 1", title: "五鹿乞食・天賜土地", desc: "飢餓過五鹿向野人乞食，野人贈與土塊！狐偃（子犯）賀曰：「天賜土地也！」軍心大振！", effectText: "爬升至 第 14 格", ladderTo: 14 },
+      { id: 12, stage: 2, type: "normal", tag: "齊國", title: "齊桓公厚禮贈馬", desc: "至齊國，齊桓公厚禮相待，贈馬二十乘，並許配宗女齊姜。", effectText: "休養生息（安全格）", action: null },
+      { id: 13, stage: 2, type: "snake", tag: "🐍 毒蛇頭 2", title: "懷與安，實敗名", desc: "重耳貪戀齊國安逸生活，滿足於「有馬二十乘、妻齊姜」，不思返晉進取！", effectText: "滑落至 第 10 格", snakeTo: 10 },
+      { id: 14, stage: 2, type: "reward", tag: "獎勵 ①・齊姜", title: "齊姜與狐偃醉遣重耳", desc: "齊姜殺洩密蠶妾，勸諫「懷與安，實敗名」，與子犯合謀灌醉重耳送上馬車，重燃霸志！", effectText: "立即再擲骰子一次", cardKey: "reward1" },
+      { id: 15, stage: 2, type: "snake", tag: "🐍 毒蛇頭 3", title: "曹共公無禮窺浴", desc: "及曹，曹共公聞重耳駢脅（肋骨相連），竟趁重耳洗澡時貼近偷窺肋骨！", effectText: "受辱滑落至 第 12 格", snakeTo: 12 },
+      { id: 16, stage: 2, type: "chance", tag: "機會 ①・僖負羈", title: "機會抉擇（曹國）", desc: "曹大夫僖負羈聽從妻子建議，夜裡送來藏有寶玉的飯菜……", effectText: "抽機會卡 ①", cardKey: "chance1", deck: "chance" },
+      { id: 17, stage: 2, type: "move", tag: "宋國", title: "宋襄公厚禮相贈", desc: "宋國遭楚敗之餘，宋襄公仍以國君之禮款待重耳，贈馬二十乘助行。", effectText: "前進 2 格", action: { kind: "delta", value: 2 } },
+      { id: 18, stage: 2, type: "move", tag: "鄭國", title: "鄭文公不禮・叔詹苦諫", desc: "過鄭國，鄭文公不禮焉，大夫叔詹以「晉公子有三焉」苦勸弗聽。", effectText: "後退 1 格", action: { kind: "delta", value: -1 } },
+
+      { id: 19, stage: 3, type: "normal", tag: "楚國", title: "楚成王設宴・退避三舍", desc: "楚成王以諸侯之禮厚待，問將何以報之？重耳從容許諾：「晉楚治兵，遇於中原，其辟君三舍。」", effectText: "氣度非凡（安全格）", action: null },
+      { id: 20, stage: 3, type: "punish", tag: "懲罰 ②", title: "楚臣子玉請殺重耳", desc: "楚令尹子玉看出重耳志向遠大，向楚成王請求殺害重耳，氣氛萬分驚險！", effectText: "後退 2 格並暫停 1 回合", cardKey: "punish2" },
+      { id: 21, stage: 3, type: "ladder", tag: "🪜 梯子底 2", title: "秦穆公聯姻・妻懷嬴", desc: "楚王護送重耳至秦，秦穆公極禮遇，許配宗族五女（含懷嬴），秦晉正式結盟！", effectText: "爬升至 第 24 格", ladderTo: 24 },
+      { id: 22, stage: 3, type: "fate", tag: "命運 ②", title: "命運轉折（二）", desc: "抽取命運卡，諸侯賢臣之言論傳遍天下！", effectText: "抽命運卡 ②", cardKey: "fate2", deck: "fate" },
+      { id: 23, stage: 3, type: "ladder", tag: "🪜 梯子底 3", title: "賦詩言志・渡河返晉", desc: "重耳賦〈河水〉，穆公頌〈六月〉，趙衰拜賜，秦穆公遂派重兵護送渡黃河！", effectText: "直達 第 26 格", ladderTo: 26 },
+      { id: 24, stage: 3, type: "normal", tag: "重返晉國", title: "郇城盟約・登基晉文公", desc: "辛丑郇城盟約，重耳接管晉軍，派人至高梁殺晉懷公，正式登基為晉文公！", effectText: "榮登大位（安全格）", action: null },
+      { id: 25, stage: 3, type: "chance", tag: "機會 ②・寺人披", title: "機會抉擇（晉國）", desc: "昔日追殺的寺人披與竊財的頭須請求晉見……", effectText: "抽機會卡 ②", cardKey: "chance2", deck: "chance" },
+      { id: 26, stage: 3, type: "snake", tag: "🐍 毒蛇頭 4", title: "呂甥、郤芮火燒公室", desc: "舊臣呂甥、郤芮圖謀不軌，放火燒毀晉國公室！重耳被迫出奔王城尋求秦穆公密會支援。", effectText: "滑落至 第 21 格", snakeTo: 21 },
+      { id: 27, stage: 3, type: "reward", tag: "獎勵 ②・介之推", title: "介之推不言祿・綿上封田", desc: "文公行賞從亡者，介之推高潔不言祿、與母偕隱綿上，文公虛封綿上田以誌過表彰！", effectText: "直接前進 2 格", cardKey: "reward2" },
+      { id: 28, stage: 3, type: "move", tag: "修明內政", title: "示義・示信・示禮", desc: "聽從狐偃、趙衰建議，納周襄王示義、伐原示信、被廬閱兵示禮，晉國國力大盛！", effectText: "前進 1 格", action: { kind: "delta", value: 1 } },
+      { id: 29, stage: 3, type: "normal", tag: "城濮之戰", title: "退避三舍・大敗楚師", desc: "救宋破楚，實踐退避三舍承諾，於城濮大敗楚軍子玉，威震天下！", effectText: "霸業在望（安全格）", action: null },
+      { id: 30, stage: 3, type: "goal", tag: "終點・稱霸", title: "踐土之盟・晉文霸業", desc: "周襄王策命晉文公為侯伯，踐土會盟諸侯，正式成為春秋霸主！🎉", effectText: "達成霸業・獲勝！", action: null }
+    ];
+
+    const CARDS = {
+      chance1: {
+        category: "機會 ①",
+        color: "#284b7a",
+        icon: "🍚💎",
+        title: "曹國大夫僖負羈・盤飧寘璧",
+        desc: "僖負羈聽從妻子建議，偷偷送來「盤飧寘璧」（飯菜中藏寶玉）。重耳展現氣度，僅收下飯菜而退還寶玉（受飧反璧），贏得曹國賢臣暗中支持！",
+        effectLabel: "前進 3 格",
+        effect: { kind: "delta", value: 3 }
+      },
+      chance2: {
+        category: "機會 ②",
+        color: "#284b7a",
+        icon: "🛡️",
+        title: "寬恕寺人披與頭須（沐則心覆）",
+        desc: "晉文公放下斬袖與偷竊舊恨，接見寺人披與頭須，因而即時獲知呂甥、郤芮欲火燒公室的陰謀！",
+        effectLabel: "二擇一：免除下一次毒蛇滑落 ／ 或直接前進 3 格",
+        effect: { kind: "choice_chance2" }
+      },
+      fate1: {
+        category: "命運 ①",
+        color: "#6d2e68",
+        icon: "🍷",
+        title: "驪姬之亂・譖殺申生",
+        desc: "驪姬與優施、二五勾結，在祭肉下毒誣陷太子申生，並進讒言迫害重耳與夷吾，蒲城頓時風聲鶴唳！",
+        effectLabel: "退回第 2 格（蒲城）",
+        effect: { kind: "goto", value: 2 }
+      },
+      fate2: {
+        category: "命運 ②",
+        color: "#6d2e68",
+        icon: "📜",
+        title: "鄭大夫叔詹之諫",
+        desc: "鄭國大夫叔詹讚嘆重耳有天助（「同姓不蕃而育」、「天不靖晉」、「有三士狐偃、趙衰、賈佗足以上人」），雖鄭君不聽，重耳聲望卻大增！",
+        effectLabel: "前進 2 格",
+        effect: { kind: "delta", value: 2 }
+      },
+      reward1: {
+        category: "獎勵 ①",
+        color: "#b45309",
+        icon: "🐎",
+        title: "齊姜與狐偃「醉遣重耳」",
+        desc: "齊姜殺蠶妾保住機密，力勸重耳「懷與安，實敗名」，並與狐偃合謀灌醉重耳送上馬車，重燃四方之志！",
+        effectLabel: "立即再擲骰子一次",
+        effect: { kind: "extra_roll" }
+      },
+      reward2: {
+        category: "獎勵 ②",
+        color: "#b45309",
+        icon: "⛰️",
+        title: "介之推不言祿・與母偕隱",
+        desc: "介之推認為重耳復國乃天意（「貪天之功以為己力，不亦誣乎」），高風亮節激勵晉國朝野，文公以綿上為之田誌過！",
+        effectLabel: "直接前進 2 格",
+        effect: { kind: "delta", value: 2 }
+      },
+      punish1: {
+        category: "懲罰 ①",
+        color: "#8b1e1e",
+        icon: "💰",
+        title: "小臣頭須竊財潛逃",
+        desc: "逃離蒲城時，看守庫藏的小臣頭須偷走所有財物逃跑，重耳一行人盤纏盡失、寸步難行！",
+        effectLabel: "原地暫停一回合",
+        effect: { kind: "skip", value: 1 }
+      },
+      punish2: {
+        category: "懲罰 ②",
+        color: "#8b1e1e",
+        icon: "⚔️",
+        title: "楚令尹子玉請殺重耳",
+        desc: "楚國令尹子玉忌憚重耳才幹，向楚成王請求殺害重耳，幸得楚王仁厚未從，但仍令一行人驚險撤離！",
+        effectLabel: "後退 2 格並暫停一回合",
+        effect: { kind: "delta_and_skip", delta: -2, skip: 1 }
+      }
+    };
+
+    const CONNECTIONS = [
+      { type: "ladder", from: 11, to: 14, label: "五鹿乞食 11→14" },
+      { type: "ladder", from: 21, to: 24, label: "秦晉聯姻 21→24" },
+      { type: "ladder", from: 23, to: 26, label: "賦詩渡河 23→26" },
+      { type: "snake", from: 8, to: 4, label: "惠公追殺 8→4" },
+      { type: "snake", from: 13, to: 10, label: "懷安敗名 13→10" },
+      { type: "snake", from: 15, to: 12, label: "曹君偷窺 15→12" },
+      { type: "snake", from: 26, to: 21, label: "火燒公室 26→21" }
+    ];
+
+    const DEFAULT_PRESETS = [
+      { name: "重耳（公子）", short: "耳", color: "#b91c1c", mode: "human" },
+      { name: "狐偃（子犯）", short: "偃", color: "#1d4ed8", mode: "ai" },
+      { name: "趙衰（忠臣）", short: "衰", color: "#047857", mode: "off" },
+      { name: "齊姜（賢妻）", short: "姜", color: "#b45309", mode: "off" }
+    ];
+
+    // ==========================================
+    // 2. 音效模組 (Web Audio API，免外部檔案)
+    // ==========================================
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function playTone(freq, duration = 0.12, type = "triangle", vol = 0.12, delay = 0) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const now = audioCtx.currentTime + delay;
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, now);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(vol, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + duration + 0.02);
+      } catch (_) {}
+    }
+
+    const sfx = {
+      dice: () => { playTone(260, 0.06, "square", 0.05, 0); playTone(320, 0.06, "square", 0.05, 0.08); },
+      hop: () => playTone(520, 0.08, "sine", 0.09, 0),
+      ladder: () => { [440, 554, 659, 880].forEach((f, i) => playTone(f, 0.14, "triangle", 0.11, i * 0.07)); },
+      snake: () => { [390, 310, 240, 180].forEach((f, i) => playTone(f, 0.15, "sawtooth", 0.06, i * 0.08)); },
+      card: () => { playTone(587, 0.11, "triangle", 0.1, 0); playTone(784, 0.16, "triangle", 0.1, 0.09); },
+      win: () => { [523, 659, 784, 1046].forEach((f, i) => playTone(f, 0.25, "triangle", 0.14, i * 0.11)); }
+    };
+
+    // ==========================================
+    // 3. 遊戲狀態
+    // ==========================================
+    let state = {
+      players: [],
+      currentIdx: 0,
+      round: 1,
+      isAnimating: false,
+      gameOver: false,
+      exactFinish: false,
+      shuffleDecks: false,
+      showLines: true,
+      sessionId: 0
+    };
+
+    const DICE_FACES = ["", "⚀", "⚁", "⚂", "⚃", "⚄", "⚅"];
+
+    // 計算 6×5 蛇行座標 (row 0..4 由上到下, col 0..5 由左到右)
+    function getGridCoords(tileId) {
+      const zeroIdx = tileId - 1;
+      const rowFromBottom = Math.floor(zeroIdx / 6);
+      const posInRow = zeroIdx % 6;
+      const row = 4 - rowFromBottom;
+      const col = (rowFromBottom % 2 === 0) ? posInRow : (5 - posInRow);
+      return { row, col, rowFromBottom };
+    }
+
+    function getVisualOrderTiles() {
+      // 回傳 CSS Grid 由上而下、由左而右的 30 個格位
+      const cells = new Array(30);
+      for (const tile of TILES) {
+        const { row, col } = getGridCoords(tile.id);
+        cells[row * 6 + col] = tile;
+      }
+      return cells;
+    }
+
+    // ==========================================
+    // 4. 棋盤與介面渲染
+    // ==========================================
+    function renderBoard() {
+      const grid = document.getElementById("boardGrid");
+      grid.innerHTML = "";
+      const ordered = getVisualOrderTiles();
+
+      for (const tile of ordered) {
+        const div = document.createElement("div");
+        const { rowFromBottom, col } = getGridCoords(tile.id);
+
+        let typeClass = `type-${tile.type}`;
+        let tagClass = "tag-place";
+        if (tile.type === "ladder") tagClass = "tag-ladder";
+        else if (tile.type === "snake") tagClass = "tag-snake";
+        else if (tile.type === "chance") tagClass = "tag-chance";
+        else if (tile.type === "fate") tagClass = "tag-fate";
+        else if (tile.type === "reward") tagClass = "tag-reward";
+        else if (tile.type === "punish") tagClass = "tag-punish";
+
+        div.className = `tile stage-${tile.stage} ${typeClass}`;
+        div.id = `tile-${tile.id}`;
+        div.dataset.tileId = tile.id;
+
+        // 方向箭頭指示 (1→2→...→30)
+        let arrowHtml = "";
+        if (tile.id < 30) {
+          const isEvenRow = rowFromBottom % 2 === 0;
+          if ((isEvenRow && col === 5) || (!isEvenRow && col === 0)) {
+            arrowHtml = `<span class="tile-arrow arrow-up">▲</span>`;
+          } else if (isEvenRow) {
+            arrowHtml = `<span class="tile-arrow arrow-right">▶</span>`;
+          } else {
+            arrowHtml = `<span class="tile-arrow arrow-left">◀</span>`;
+          }
+        }
+
+        div.innerHTML = `
+          ${arrowHtml}
+          <div class="tile-header">
+            <span class="tile-num">${tile.id}</span>
+            <span class="tile-tag ${tagClass}">${tile.tag}</span>
+          </div>
+          <div class="tile-title">${tile.title}</div>
+          <div class="tile-effect">${tile.effectText}</div>
+          <div class="tile-tokens" id="tokens-${tile.id}"></div>
+        `;
+
+        div.addEventListener("click", () => inspectTile(tile.id));
+        div.addEventListener("mouseenter", () => highlightConnectionForTile(tile.id));
+        div.addEventListener("mouseleave", () => highlightConnectionForTile(null));
+        grid.appendChild(div);
+      }
+
+      renderTokens();
+      requestAnimationFrame(drawBoardOverlays);
+    }
+
+    function renderTokens() {
+      for (let i = 1; i <= 30; i++) {
+        const box = document.getElementById(`tokens-${i}`);
+        if (box) box.innerHTML = "";
+      }
+      state.players.forEach((p, idx) => {
+        const box = document.getElementById(`tokens-${p.pos}`);
+        if (!box) return;
+        const tok = document.createElement("div");
+        tok.className = "token" + (idx === state.currentIdx && !state.gameOver ? " current-turn-token" : "");
+        tok.style.background = p.color;
+        tok.title = `${p.name}（第 ${p.pos} 格）`;
+        tok.textContent = p.short;
+        if (p.shield) {
+          const sh = document.createElement("span");
+          sh.className = "token-shield";
+          sh.textContent = "🛡️";
+          tok.appendChild(sh);
+        }
+        box.appendChild(tok);
+      });
+    }
+
+    function drawBoardOverlays(highlightId = null) {
+      const svg = document.getElementById("overlaySvg");
+      const stage = document.getElementById("boardStage");
+      if (!svg || !stage) return;
+
+      const stageRect = stage.getBoundingClientRect();
+      if (stageRect.width === 0) return;
+
+      svg.setAttribute("viewBox", `0 0 ${stageRect.width} ${stageRect.height}`);
+      svg.innerHTML = `
+        <defs>
+          <marker id="arrowLadder" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,1 L7,4 L0,7 Z" fill="#1e6b52" />
+          </marker>
+          <marker id="arrowSnake" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+            <path d="M0,1 L7,4 L0,7 Z" fill="#b91c1c" />
+          </marker>
+        </defs>
+      `;
+
+      const getCenter = (id) => {
+        const el = document.getElementById(`tile-${id}`);
+        if (!el) return { x: 0, y: 0 };
+        const r = el.getBoundingClientRect();
+        return {
+          x: r.left - stageRect.left + r.width / 2,
+          y: r.top - stageRect.top + r.height / 2
+        };
+      };
+
+      CONNECTIONS.forEach((conn) => {
+        const a = getCenter(conn.from);
+        const b = getCenter(conn.to);
+        const isHighlighted = highlightId && (conn.from === highlightId || conn.to === highlightId);
+        const opacity = highlightId ? (isHighlighted ? 0.95 : 0.16) : 0.72;
+
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("opacity", opacity);
+
+        if (conn.type === "ladder") {
+          // 雙軌梯子 + 橫槓（水平相連如 21->24 則微向上弧）
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const dist = Math.hypot(dx, dy) || 1;
+          const nx = -dy / dist;
+          const ny = dx / dist;
+          const isHorizontal = Math.abs(dy) < 20;
+
+          if (isHorizontal) {
+            const midX = (a.x + b.x) / 2;
+            const midY = (a.y + b.y) / 2 - 34;
+            const pathStr = `M ${a.x} ${a.y - 6} Q ${midX} ${midY} ${b.x} ${b.y - 6}`;
+            const rail = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            rail.setAttribute("d", pathStr);
+            rail.setAttribute("fill", "none");
+            rail.setAttribute("stroke", "#1e6b52");
+            rail.setAttribute("stroke-width", isHighlighted ? "6" : "4.5");
+            rail.setAttribute("stroke-dasharray", "8 5");
+            rail.setAttribute("marker-end", "url(#arrowLadder)");
+            g.appendChild(rail);
+          } else {
+            const offset = 6;
+            const l1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            l1.setAttribute("x1", a.x + nx * offset); l1.setAttribute("y1", a.y + ny * offset);
+            l1.setAttribute("x2", b.x + nx * offset); l1.setAttribute("y2", b.y + ny * offset);
+            l1.setAttribute("stroke", "#1e6b52");
+            l1.setAttribute("stroke-width", isHighlighted ? "3.5" : "2.5");
+
+            const l2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            l2.setAttribute("x1", a.x - nx * offset); l2.setAttribute("y1", a.y - ny * offset);
+            l2.setAttribute("x2", b.x - nx * offset); l2.setAttribute("y2", b.y - ny * offset);
+            l2.setAttribute("stroke", "#1e6b52");
+            l2.setAttribute("stroke-width", isHighlighted ? "3.5" : "2.5");
+            g.appendChild(l1);
+            g.appendChild(l2);
+
+            const steps = Math.max(3, Math.floor(dist / 22));
+            for (let s = 1; s < steps; s++) {
+              const t = s / steps;
+              const px = a.x + dx * t;
+              const py = a.y + dy * t;
+              const rung = document.createElementNS("http://www.w3.org/2000/svg", "line");
+              rung.setAttribute("x1", px + nx * offset); rung.setAttribute("y1", py + ny * offset);
+              rung.setAttribute("x2", px - nx * offset); rung.setAttribute("y2", py - ny * offset);
+              rung.setAttribute("stroke", "#d97706");
+              rung.setAttribute("stroke-width", "2.5");
+              g.appendChild(rung);
+            }
+          }
+        } else {
+          // 蜿蜒毒蛇曲線
+          const dx = b.x - a.x;
+          const dy = b.y - a.y;
+          const dist = Math.hypot(dx, dy) || 1;
+          const nx = -dy / dist;
+          const ny = dx / dist;
+          const amp = 24;
+          const c1x = a.x + dx * 0.33 + nx * amp;
+          const c1y = a.y + dy * 0.33 + ny * amp;
+          const c2x = a.x + dx * 0.66 - nx * amp;
+          const c2y = a.y + dy * 0.66 - ny * amp;
+
+          const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          path.setAttribute("d", `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`);
+          path.setAttribute("fill", "none");
+          path.setAttribute("stroke", "#c53030");
+          path.setAttribute("stroke-width", isHighlighted ? "7" : "5");
+          path.setAttribute("stroke-linecap", "round");
+          path.setAttribute("marker-end", "url(#arrowSnake)");
+          g.appendChild(path);
+
+          const spine = document.createElementNS("http://www.w3.org/2000/svg", "path");
+          spine.setAttribute("d", `M ${a.x} ${a.y} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${b.x} ${b.y}`);
+          spine.setAttribute("fill", "none");
+          spine.setAttribute("stroke", "#fecaca");
+          spine.setAttribute("stroke-width", "1.6");
+          spine.setAttribute("stroke-dasharray", "5 6");
+          g.appendChild(spine);
+        }
+
+        // 中點提示標籤
+        const labelX = (a.x + b.x) / 2;
+        const labelY = (a.y + b.y) / 2 - (conn.from === 21 ? 22 : 0);
+        const pill = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+        pill.setAttribute("x", labelX - 24);
+        pill.setAttribute("y", labelY - 9);
+        pill.setAttribute("width", 48);
+        pill.setAttribute("height", 18);
+        pill.setAttribute("rx", 9);
+        pill.setAttribute("fill", conn.type === "ladder" ? "#1e6b52" : "#991b1b");
+        pill.setAttribute("stroke", "#fff");
+        pill.setAttribute("stroke-width", "1");
+        g.appendChild(pill);
+
+        const txt = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        txt.setAttribute("x", labelX);
+        txt.setAttribute("y", labelY + 3.5);
+        txt.setAttribute("text-anchor", "middle");
+        txt.setAttribute("font-size", "10");
+        txt.setAttribute("font-weight", "bold");
+        txt.setAttribute("fill", "#fff");
+        txt.textContent = `${conn.type === "ladder" ? "🪜" : "🐍"}${conn.from}→${conn.to}`;
+        g.appendChild(txt);
+
+        svg.appendChild(g);
+      });
+    }
+
+    function highlightConnectionForTile(tileId) {
+      if (!state.showLines) return;
+      const hasConn = tileId && CONNECTIONS.some(c => c.from === tileId || c.to === tileId);
+      drawBoardOverlays(hasConn ? tileId : null);
+    }
+
+    function renderSidebar() {
+      const p = state.players[state.currentIdx];
+      document.getElementById("roundLabel").textContent = `第 ${state.round} 回合`;
+      if (p) {
+        const tile = TILES[p.pos - 1];
+        const avatar = document.getElementById("turnAvatar");
+        avatar.style.background = p.color;
+        avatar.textContent = p.short;
+        document.getElementById("turnPlayerName").textContent = p.name + (p.isAI ? "（電腦 AI）" : "");
+        document.getElementById("turnPlayerLoc").textContent = `位於第 ${p.pos} 格【${tile.title}】`;
+      }
+
+      const btnRoll = document.getElementById("btnRoll");
+      btnRoll.disabled = state.isAnimating || state.gameOver || (p && p.isAI);
+      btnRoll.textContent = state.gameOver ? "霸業已成（已結束）" : (p && p.isAI ? "電腦思考中…" : "🎲 擲骰前進");
+
+      // Player list
+      const list = document.getElementById("playerList");
+      list.innerHTML = "";
+      state.players.forEach((pl, idx) => {
+        const tile = TILES[pl.pos - 1];
+        const row = document.createElement("div");
+        row.className = "player-row" + (idx === state.currentIdx && !state.gameOver ? " is-current" : "");
+        row.innerHTML = `
+          <div class="p-badge" style="background:${pl.color}">${pl.short}</div>
+          <div class="p-info">
+            <div class="p-name">
+              <span>${pl.name}</span>
+              ${pl.isAI ? '<span class="mini-chip chip-ai">AI</span>' : ""}
+              ${pl.shield ? '<span class="mini-chip chip-shield">🛡️免蛇護盾</span>' : ""}
+              ${pl.skipTurns > 0 ? '<span class="mini-chip chip-skip">⏸️下回暫停</span>' : ""}
+            </div>
+            <div class="p-sub">${tile.tag}・${tile.title}</div>
+          </div>
+          <div class="p-pos">${pl.pos}/30</div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function inspectTile(tileId) {
+      const tile = TILES[tileId - 1];
+      if (!tile) return;
+      const box = document.getElementById("inspectorBox");
+      box.innerHTML = `
+        <div class="inspector-header">
+          <span class="inspector-num">第 ${tile.id} 格</span>
+          <span class="inspector-title">${tile.title}</span>
+        </div>
+        <div style="color:var(--ink-dark);margin-bottom:6px;">${tile.desc}</div>
+        <div style="font-weight:700;color:var(--cinnabar);">⚡ 機制效果：${tile.effectText}</div>
+      `;
+    }
+
+    function addLog(text, type = "") {
+      const list = document.getElementById("logList");
+      const item = document.createElement("div");
+      item.className = `log-item ${type ? "log-" + type : ""}`;
+      item.innerHTML = text;
+      list.prepend(item);
+    }
+
+    function setHint(text) {
+      document.getElementById("statusHint").textContent = text;
+    }
+
+    // ==========================================
+    // 5. 核心遊戲流程與動畫
+    // ==========================================
+    const sleep = (ms) => new Promise(res => setTimeout(res, ms));
+
+    async function handleTurnStart() {
+      const sid = state.sessionId;
+      if (state.gameOver) return;
+      renderSidebar();
+      renderTokens();
+
+      const p = state.players[state.currentIdx];
+      inspectTile(p.pos);
+
+      // 檢查是否需要暫停一回合
+      if (p.skipTurns > 0) {
+        p.skipTurns -= 1;
+        setHint(`⏸️ ${p.name} 本回合暫停行動！`);
+        addLog(`⏸️ <strong>${p.name}</strong> 因懲罰效果本回合暫停一次。`, "card");
+        renderSidebar();
+        await sleep(1100);
+        if (sid !== state.sessionId) return;
+        await advanceTurn();
+        return;
+      }
+
+      if (p.isAI) {
+        setHint(`🤖 ${p.name} 正在觀察局勢準備擲骰…`);
+        await sleep(750);
+        if (sid !== state.sessionId) return;
+        rollDice();
+      } else {
+        setHint(`輪到【${p.name}】！請點擊「擲骰前進」或按空白鍵。`);
+      }
+    }
+
+    async function rollDice() {
+      if (state.isAnimating || state.gameOver) return;
+      const sid = state.sessionId;
+      state.isAnimating = true;
+      renderSidebar();
+
+      const p = state.players[state.currentIdx];
+      const diceBox = document.getElementById("diceBox");
+      diceBox.classList.add("rolling");
+      sfx.dice();
+
+      for (let i = 0; i < 6; i++) {
+        diceBox.textContent = DICE_FACES[Math.floor(Math.random() * 6) + 1];
+        await sleep(70);
+        if (sid !== state.sessionId) return;
+      }
+
+      const roll = Math.floor(Math.random() * 6) + 1;
+      diceBox.classList.remove("rolling");
+      diceBox.textContent = DICE_FACES[roll];
+
+      addLog(`🎲 <strong>${p.name}</strong> 擲出了 <strong>${roll} 點</strong>！`);
+      setHint(`${p.name} 擲出了 ${roll} 點，正在移動…`);
+
+      // 計算移動路徑（逐格跳躍）
+      let steps = [];
+      let cur = p.pos;
+      if (state.exactFinish) {
+        let dir = 1;
+        for (let i = 0; i < roll; i++) {
+          if (cur === 30) dir = -1;
+          cur += dir;
+          steps.push(cur);
+        }
+      } else {
+        for (let i = 0; i < roll; i++) {
+          if (cur < 30) {
+            cur += 1;
+            steps.push(cur);
+          }
+        }
+      }
+
+      await animateStepMove(p, steps, sid);
+      if (sid !== state.sessionId) return;
+
+      const landedTile = TILES[p.pos - 1];
+      inspectTile(landedTile.id);
+
+      let extraRoll = false;
+
+      if (landedTile.id === 30) {
+        await declareWinner(p);
+        return;
+      }
+
+      // 處理特殊格位效果
+      if (landedTile.type === "ladder") {
+        sfx.ladder();
+        addLog(`🪜 <strong>${p.name}</strong> 觸發貴人相助【${landedTile.title}】，爬升至第 ${landedTile.ladderTo} 格！`, "ladder");
+        await showEventModal({
+          badge: "🪜 梯子・貴人相助",
+          color: "#1e6b52",
+          icon: "🪜",
+          title: landedTile.title,
+          desc: landedTile.desc,
+          effect: `順著梯子爬升至 第 ${landedTile.ladderTo} 格`,
+          isAI: p.isAI
+        });
+        if (sid !== state.sessionId) return;
+        await jumpToTile(p, landedTile.ladderTo, sid);
+
+      } else if (landedTile.type === "snake") {
+        if (p.shield) {
+          p.shield = false;
+          sfx.card();
+          addLog(`🛡️ <strong>${p.name}</strong> 的「免除毒蛇護盾」發動！識破【${landedTile.title}】，免除滑落！`, "card");
+          await showEventModal({
+            badge: "🛡️ 護盾發動！",
+            color: "#284b7a",
+            icon: "🛡️",
+            title: "寬恕舊臣・化險為夷",
+            desc: `原本應因【${landedTile.title}】滑落至第 ${landedTile.snakeTo} 格，但因事前寬恕寺人披與頭須獲得情報，成功避開災厄！`,
+            effect: `護盾抵擋成功，安穩停留在 第 ${landedTile.id} 格`,
+            isAI: p.isAI
+          });
+        } else {
+          sfx.snake();
+          addLog(`🐍 <strong>${p.name}</strong> 遭遇反派迫害【${landedTile.title}】，滑落至第 ${landedTile.snakeTo} 格！`, "snake");
+          await showEventModal({
+            badge: "🐍 毒蛇・反派迫害",
+            color: "#b91c1c",
+            icon: "🐍",
+            title: landedTile.title,
+            desc: landedTile.desc,
+            effect: `順著蛇身滑落至 第 ${landedTile.snakeTo} 格`,
+            isAI: p.isAI
+          });
+          if (sid !== state.sessionId) return;
+          await jumpToTile(p, landedTile.snakeTo, sid);
+        }
+
+      } else if (landedTile.cardKey) {
+        sfx.card();
+        let cardKey = landedTile.cardKey;
+        if (state.shuffleDecks && landedTile.deck) {
+          const pool = landedTile.deck === "chance" ? ["chance1", "chance2"] : ["fate1", "fate2"];
+          cardKey = pool[Math.floor(Math.random() * pool.length)];
+        }
+        const card = CARDS[cardKey];
+        const outcome = await triggerCardModal(p, card);
+        if (sid !== state.sessionId) return;
+        if (outcome === "extra_roll") extraRoll = true;
+
+      } else if (landedTile.action && landedTile.action.kind === "delta") {
+        const delta = landedTile.action.value;
+        const target = Math.max(1, Math.min(30, p.pos + delta));
+        addLog(`✨ <strong>${p.name}</strong> 觸發【${landedTile.title}】，${delta > 0 ? "前進" : "後退"} ${Math.abs(delta)} 格（至第 ${target} 格）。`);
+        await showEventModal({
+          badge: delta > 0 ? "✨ 順境推進" : "⚠️ 遭遇阻礙",
+          color: delta > 0 ? "#1e6b52" : "#9a3412",
+          icon: delta > 0 ? "🐎" : "🪨",
+          title: landedTile.title,
+          desc: landedTile.desc,
+          effect: `${delta > 0 ? "前進" : "後退"} ${Math.abs(delta)} 格 ➔ 第 ${target} 格`,
+          isAI: p.isAI
+        });
+        if (sid !== state.sessionId) return;
+        await jumpToTile(p, target, sid);
+      } else {
+        addLog(`📍 <strong>${p.name}</strong> 抵達第 ${landedTile.id} 格【${landedTile.title}】。`);
+      }
+
+      if (sid !== state.sessionId) return;
+      renderTokens();
+      inspectTile(p.pos);
+
+      if (p.pos >= 30) {
+        await declareWinner(p);
+        return;
+      }
+
+      state.isAnimating = false;
+      if (extraRoll) {
+        addLog(`🎲 <strong>${p.name}</strong> 獲得額外擲骰機會！`, "card");
+        setHint(`🎉 ${p.name} 獲得再擲骰子一次的獎勵！`);
+        renderSidebar();
+        if (p.isAI) {
+          await sleep(700);
+          if (sid === state.sessionId) rollDice();
+        }
+      } else {
+        await advanceTurn();
+      }
+    }
+
+    async function animateStepMove(player, steps, sid) {
+      for (const s of steps) {
+        if (sid !== state.sessionId) return;
+        player.pos = s;
+        sfx.hop();
+        renderTokens();
+        const tileEl = document.getElementById(`tile-${s}`);
+        if (tileEl) tileEl.classList.add("active-step");
+        await sleep(230);
+        if (tileEl) tileEl.classList.remove("active-step");
+      }
+    }
+
+    async function jumpToTile(player, targetPos, sid) {
+      if (sid !== state.sessionId) return;
+      player.pos = Math.max(1, Math.min(30, targetPos));
+      sfx.hop();
+      renderTokens();
+      const tileEl = document.getElementById(`tile-${player.pos}`);
+      if (tileEl) {
+        tileEl.classList.add("active-step");
+        await sleep(360);
+        tileEl.classList.remove("active-step");
+      }
+    }
+
+    async function advanceTurn() {
+      state.currentIdx = (state.currentIdx + 1) % state.players.length;
+      if (state.currentIdx === 0) state.round += 1;
+      state.isAnimating = false;
+      await handleTurnStart();
+    }
+
+    async function declareWinner(player) {
+      state.gameOver = true;
+      state.isAnimating = false;
+      renderTokens();
+      renderSidebar();
+      sfx.win();
+      addLog(`🏆 <strong>${player.name}</strong> 抵達第 30 格踐土之盟，成就春秋霸業！`, "win");
+      setHint(`🏆 恭喜 ${player.name} 成為春秋霸主！`);
+
+      await showEventModal({
+        badge: "🏆 霸業達成・遊戲勝利",
+        color: "#b88414",
+        icon: "👑",
+        title: `${player.name}・踐土之盟稱霸春秋！`,
+        desc: "歷經十九年流亡，走過狄國、衛、齊、曹、宋、鄭、楚、秦諸侯列國，終返晉國修明內政、城濮破楚，踐土會盟成為春秋霸主！",
+        effect: `歷時 ${state.round} 回合・榮登第 30 格終點`,
+        buttonText: "太棒了！",
+        isAI: false
+      });
+    }
+
+    // ==========================================
+    // 6. 彈窗與卡牌處理
+    // ==========================================
+    function showEventModal({ badge, color, icon, title, desc, effect, buttonText = "確認繼續", isAI = false }) {
+      return new Promise((resolve) => {
+        const modal = document.getElementById("eventModal");
+        const box = document.getElementById("eventModalBox");
+        box.style.borderColor = color;
+        const badgeEl = document.getElementById("emBadge");
+        badgeEl.textContent = badge;
+        badgeEl.style.background = color;
+        document.getElementById("emIcon").textContent = icon;
+        document.getElementById("emTitle").textContent = title;
+        document.getElementById("emDesc").textContent = desc;
+        document.getElementById("emEffect").textContent = effect;
+
+        const actions = document.getElementById("emActions");
+        actions.innerHTML = "";
+        const btn = document.createElement("button");
+        btn.className = "btn-primary";
+        btn.textContent = buttonText;
+        btn.onclick = () => {
+          modal.classList.remove("open");
+          resolve();
+        };
+        actions.appendChild(btn);
+        modal.classList.add("open");
+
+        if (isAI) {
+          setTimeout(() => {
+            if (modal.classList.contains("open")) {
+              modal.classList.remove("open");
+              resolve();
+            }
+          }, 1200);
+        }
+      });
+    }
+
+    function triggerCardModal(player, card) {
+      return new Promise((resolve) => {
+        const sid = state.sessionId;
+        const modal = document.getElementById("eventModal");
+        const box = document.getElementById("eventModalBox");
+        box.style.borderColor = card.color;
+        const badgeEl = document.getElementById("emBadge");
+        badgeEl.textContent = card.category;
+        badgeEl.style.background = card.color;
+        document.getElementById("emIcon").textContent = card.icon;
+        document.getElementById("emTitle").textContent = card.title;
+        document.getElementById("emDesc").textContent = card.desc;
+        document.getElementById("emEffect").textContent = card.effectLabel;
+
+        const actions = document.getElementById("emActions");
+        actions.innerHTML = "";
+
+        const finishWith = async (choice) => {
+          modal.classList.remove("open");
+          if (sid !== state.sessionId) return resolve(null);
+
+          const eff = card.effect;
+          if (eff.kind === "delta") {
+            const target = Math.max(1, Math.min(30, player.pos + eff.value));
+            addLog(`🃏 <strong>${player.name}</strong> 觸發【${card.category}・${card.title}】，移動至第 ${target} 格。`, "card");
+            await jumpToTile(player, target, sid);
+            resolve("done");
+          } else if (eff.kind === "goto") {
+            addLog(`🃏 <strong>${player.name}</strong> 觸發【${card.category}・${card.title}】，退回第 ${eff.value} 格！`, "snake");
+            await jumpToTile(player, eff.value, sid);
+            resolve("done");
+          } else if (eff.kind === "extra_roll") {
+            addLog(`🃏 <strong>${player.name}</strong> 觸發【${card.category}・${card.title}】，可再擲骰一次！`, "ladder");
+            resolve("extra_roll");
+          } else if (eff.kind === "skip") {
+            player.skipTurns += eff.value;
+            addLog(`🃏 <strong>${player.name}</strong> 觸發【${card.category}・${card.title}】，下回合暫停一次！`, "snake");
+            resolve("done");
+          } else if (eff.kind === "delta_and_skip") {
+            const target = Math.max(1, Math.min(30, player.pos + eff.delta));
+            player.skipTurns += eff.skip;
+            addLog(`🃏 <strong>${player.name}</strong> 觸發【${card.category}・${card.title}】，退至第 ${target} 格並下回合暫停！`, "snake");
+            await jumpToTile(player, target, sid);
+            resolve("done");
+          } else if (eff.kind === "choice_chance2") {
+            if (choice === "shield") {
+              player.shield = true;
+              addLog(`🛡️ <strong>${player.name}</strong> 選擇【免除下一次毒蛇滑落護盾】！`, "card");
+            } else {
+              const target = Math.max(1, Math.min(30, player.pos + 3));
+              addLog(`🐎 <strong>${player.name}</strong> 選擇【直接前進 3 格】至第 ${target} 格！`, "ladder");
+              await jumpToTile(player, target, sid);
+            }
+            resolve("done");
+          }
+        };
+
+        if (card.effect.kind === "choice_chance2") {
+          const btnShield = document.createElement("button");
+          btnShield.className = "btn-secondary";
+          btnShield.textContent = "🛡️ 獲得免除下一次毒蛇護盾";
+          btnShield.onclick = () => finishWith("shield");
+
+          const btnFwd = document.createElement("button");
+          btnFwd.className = "btn-primary";
+          btnFwd.textContent = "🐎 直接前進 3 格（至第28格）";
+          btnFwd.onclick = () => finishWith("forward");
+
+          actions.appendChild(btnShield);
+          actions.appendChild(btnFwd);
+
+          if (player.isAI) {
+            setTimeout(() => {
+              if (modal.classList.contains("open")) {
+                finishWith(player.shield ? "forward" : "shield");
+              }
+            }, 1200);
+          }
+        } else {
+          const btnOk = document.createElement("button");
+          btnOk.className = "btn-primary";
+          btnOk.textContent = "執行卡牌效果";
+          btnOk.onclick = () => finishWith("ok");
+          actions.appendChild(btnOk);
+
+          if (player.isAI) {
+            setTimeout(() => {
+              if (modal.classList.contains("open")) finishWith("ok");
+            }, 1200);
+          }
+        }
+
+        modal.classList.add("open");
+      });
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    function buildCompendium() {
+      const grid = document.getElementById("compendiumGrid");
+      grid.innerHTML = "";
+      const entries = [
+        { key: "chance1", cls: "deck-chance" },
+        { key: "chance2", cls: "deck-chance" },
+        { key: "fate1", cls: "deck-fate" },
+        { key: "fate2", cls: "deck-fate" },
+        { key: "reward1", cls: "deck-reward" },
+        { key: "reward2", cls: "deck-reward" },
+        { key: "punish1", cls: "deck-punish" },
+        { key: "punish2", cls: "deck-punish" }
+      ];
+      entries.forEach(({ key, cls }) => {
+        const c = CARDS[key];
+        const div = document.createElement("div");
+        div.className = `deck-card ${cls}`;
+        div.innerHTML = `
+          <h4>${c.icon} 【${c.category}】${c.title}</h4>
+          <p style="margin:4px 0 8px;">${c.desc}</p>
+          <div style="font-weight:800;color:var(--cinnabar);">➔ ${c.effectLabel}</div>
+        `;
+        grid.appendChild(div);
+      });
+    }
+
+    // ==========================================
+    // 7. 開新局與玩家設定
+    // ==========================================
+    function buildSetupModal() {
+      const wrap = document.getElementById("setupPlayers");
+      wrap.innerHTML = "";
+      DEFAULT_PRESETS.forEach((pr, idx) => {
+        const row = document.createElement("div");
+        row.className = "setup-row";
+        row.innerHTML = `
+          <div class="p-badge" style="background:${pr.color}">${pr.short}</div>
+          <input type="text" id="sp-name-${idx}" value="${pr.name}" maxlength="12" />
+          <select id="sp-mode-${idx}">
+            <option value="human" ${pr.mode === "human" ? "selected" : ""}>👤 玩家操控</option>
+            <option value="ai" ${pr.mode === "ai" ? "selected" : ""}>🤖 電腦 AI</option>
+            <option value="off" ${pr.mode === "off" ? "selected" : ""}>✖️ 不加入</option>
+          </select>
+        `;
+        wrap.appendChild(row);
+      });
+      document.getElementById("optExactFinish").checked = state.exactFinish;
+      document.getElementById("optShuffleDecks").checked = state.shuffleDecks;
+    }
+
+    function startNewGame(customPlayers = null) {
+      state.sessionId += 1;
+      state.currentIdx = 0;
+      state.round = 1;
+      state.isAnimating = false;
+      state.gameOver = false;
+
+      if (customPlayers) {
+        state.players = customPlayers;
+      } else {
+        state.players = DEFAULT_PRESETS
+          .filter(p => p.mode !== "off")
+          .map(p => ({
+            name: p.name,
+            short: p.short,
+            color: p.color,
+            isAI: p.mode === "ai",
+            pos: 1,
+            shield: false,
+            skipTurns: 0
+          }));
+      }
+
+      document.getElementById("logList").innerHTML = "";
+      document.getElementById("diceBox").textContent = "🎲";
+      document.getElementById("eventModal").classList.remove("open");
+
+      addLog(`🚩 <strong>新局開始！</strong> 參與者：${state.players.map(p => p.name).join("、")}。從蒲城第 1 格出發！`);
+      renderBoard();
+      handleTurnStart();
+    }
+
+    // ==========================================
+    // 8. 事件綁定與初始化
+    // ==========================================
+    document.getElementById("btnRoll").addEventListener("click", rollDice);
+
+    document.getElementById("btnToggleLines").addEventListener("click", (e) => {
+      state.showLines = !state.showLines;
+      e.currentTarget.classList.toggle("active", state.showLines);
+      document.getElementById("overlaySvg").classList.toggle("hidden-lines", !state.showLines);
+    });
+
+    document.getElementById("btnSound").addEventListener("click", (e) => {
+      soundEnabled = !soundEnabled;
+      e.currentTarget.textContent = soundEnabled ? "🔊 音效：開" : "🔇 音效：關";
+    });
+
+    document.getElementById("btnCompendium").addEventListener("click", () => openModal("compendiumModal"));
+    document.getElementById("btnRules").addEventListener("click", () => openModal("rulesModal"));
+    document.getElementById("btnNewGame").addEventListener("click", () => {
+      buildSetupModal();
+      openModal("setupModal");
+    });
+
+    document.getElementById("btnStartConfigured").addEventListener("click", () => {
+      const configured = [];
+      DEFAULT_PRESETS.forEach((pr, idx) => {
+        const mode = document.getElementById(`sp-mode-${idx}`).value;
+        const name = document.getElementById(`sp-name-${idx}`).value.trim() || pr.name;
+        if (mode !== "off") {
+          configured.push({
+            name,
+            short: name.charAt(0),
+            color: pr.color,
+            isAI: mode === "ai",
+            pos: 1,
+            shield: false,
+            skipTurns: 0
+          });
+        }
+      });
+      if (configured.length === 0) {
+        alert("請至少選擇 1 位玩家或電腦 AI！");
+        return;
+      }
+      state.exactFinish = document.getElementById("optExactFinish").checked;
+      state.shuffleDecks = document.getElementById("optShuffleDecks").checked;
+      closeModal("setupModal");
+      startNewGame(configured);
+    });
+
+    // 點擊背景或按 Esc 關閉說明/圖鑑/設定視窗
+    ["compendiumModal", "rulesModal", "setupModal"].forEach((id) => {
+      document.getElementById(id).addEventListener("click", (e) => {
+        if (e.target.id === id) closeModal(id);
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        const anyModalOpen = document.querySelector(".modal-backdrop.open");
+        if (!anyModalOpen && !state.isAnimating && !state.gameOver) {
+          const p = state.players[state.currentIdx];
+          if (p && !p.isAI) {
+            e.preventDefault();
+            rollDice();
+          }
+        }
+      } else if (e.key === "Escape") {
+        ["compendiumModal", "rulesModal", "setupModal"].forEach(closeModal);
+      }
+    });
+
+    // 視窗縮放時重新對齊 SVG 蛇梯連線
+    const resizeObserver = new ResizeObserver(() => {
+      drawBoardOverlays();
+    });
+    resizeObserver.observe(document.getElementById("boardStage"));
+
+    // 啟動遊戲
+    buildCompendium();
+    startNewGame();
+  </script>
+</body>
+</html>
